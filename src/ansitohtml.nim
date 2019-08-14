@@ -42,7 +42,13 @@ const styleTable = {
 
 }.toTable
 
-proc ansiToHtml*(input: string, styleTable = styleTable): string =
+proc ansiToHtml*(input: string, extraStyleTable = styleTable): string =
+  template hasStyle(idx: string): bool =
+    extraStyleTable.hasKey(idx) or styleTable.hasKey(idx)
+
+  template getStyle(idx: string): string =
+    extraStyleTable.getOrDefault(idx, styleTable[idx])
+
   let ansiSequence = input.parseAnsi()
   for part in ansiSequence:
     case part.kind:
@@ -64,9 +70,9 @@ proc ansiToHtml*(input: string, styleTable = styleTable): string =
                 if parameters[i+1] == "5":
                   let colourid = parseInt(parameters[i+2])
                   if colourid < 8:
-                    styles.add styleTable[$(colourid + (if param == "48": 40 else: 30))] & ";"
+                    styles.add getStyle($(colourid + (if param == "48": 40 else: 30))) & ";"
                   elif colourid < 16:
-                    styles.add styleTable[$(colourid + (if param == "48": 100 else: 90))] & ";"
+                    styles.add getStyle($(colourid + (if param == "48": 100 else: 90))) & ";"
                   elif colourid > 231:
                     let c = (colourid - 232) * 10 + 8
                     styles.add style & " rgb(" & $c & "," & $c & "," & $c & ");"
@@ -86,7 +92,7 @@ proc ansiToHtml*(input: string, styleTable = styleTable): string =
                     parameters[i+3] & "," &
                     parameters[i+4] & ");"
                   i += 4
-            elif styleTable.hasKey(param):
-              styles.add styleTable[param] & ";"
+            elif hasStyle(param):
+              styles.add getStyle(param) & ";"
             i += 1
           result.add "<span style=\"" & styles & "\">"

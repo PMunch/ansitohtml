@@ -24,3 +24,7 @@ test "Complex colour":
 test "End and begin right after each other":
   check "\e[31mHello \e[m\e[34mworld\e[m".ansiToHtml ==
     "<span style=\"color: maroon;\">Hello </span><span style=\"color: blue;\">world</span>"
+
+test "Custom table expands default table":
+  check "\e[34mHello\e[m \e[31mworld\e[m".ansiToHtml({"31": "color: green"}.toTable) ==
+    "<span style=\"color: blue;\">Hello</span> <span style=\"color: green;\">world</span>"
