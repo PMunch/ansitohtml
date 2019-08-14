@@ -20,3 +20,7 @@ test "Custom table":
 test "Complex colour":
   check "Hello \e[38;5;247;48;2;112;100;30mworld\e[m".ansiToHtml ==
     "Hello <span style=\"color: rgb(158,158,158);background-color: rgb(112,100,30);\">world</span>"
+
+test "End and begin right after each other":
+  check "\e[31mHello \e[m\e[34mworld\e[m".ansiToHtml ==
+    "<span style=\"color: maroon;\">Hello </span><span style=\"color: blue;\">world</span>"
